@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [employees, setEmployees] = useState([]);
@@ -27,16 +28,26 @@ const Home = () => {
             </tr>
           </thead>
           <tbody>
-            {
-                employees.map((employee, index)=>(
-                    <tr>
-                        <th scope="row" key={index}>{employee.employeeID}</th>
-                        <td>{employee.companyID}</td>
-                        <td>{employee.firstName}</td>
-                        <td>{employee.lastName}</td>
-                    </tr>
-                ))
-            }
+            {employees.map((employee, index) => (
+              <tr>
+                <th scope="row" key={index}>
+                  {employee.employeeID}
+                </th>
+                <td>{employee.companyID}</td>
+                <td>{employee.firstName}</td>
+                <td>{employee.lastName}</td>
+                <td>
+                  <button className="btn btn-info mx-2">View</button>
+                  <Link
+                    className="btn btn-dark mx-2"
+                    to={`/editEmployee/${employee.employeeID}`}
+                  >
+                    Edit
+                  </Link>
+                  <button className="btn btn-danger mx-2">Delete</button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
