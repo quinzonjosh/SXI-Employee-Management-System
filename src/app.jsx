@@ -9,8 +9,9 @@ export function App() {
       <Router>
         <Navbar />
         <Routes>
-          <Route exact path ="/" element={<Home/>}/>
+          <Route exact path ="/employees" element={<Home/>}/>
           <Route exact path ="/addEmployee" element={<AddEmployee/>}/>
+          <Route exact path ="/editEmployee/:employeeID" element={<EditEmployee/>}/>
         </Routes>
       </Router>        
     </>

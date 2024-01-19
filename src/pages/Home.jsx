@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [employees, setEmployees] = useState([]);
@@ -36,7 +37,7 @@ const Home = () => {
                         <td>{employee.lastName}</td>
                         <td>
                             <button className="btn btn-info mx-2">View</button>
-                            <button className="btn btn-dark mx-2">Edit</button>
+                            <Link to={`/editEmployee/${employee.employeeID}`} className="btn btn-dark mx-2">Edit</Link>
                             <button className="btn btn-danger mx-2">Delete</button>
                         </td>
                     </tr>
