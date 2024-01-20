@@ -25,7 +25,7 @@ const EditEmployee = () => {
     salary,
   } = employee;
 
-  const {employeeID} = useParams()
+  const { employeeID } = useParams();
 
   const handleChange = (e) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
@@ -35,20 +35,25 @@ const EditEmployee = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.put(`http://localhost:8080/employees/edit/${employeeID}`, employee);
+    await axios.put(
+      `http://localhost:8080/employees/edit/${employeeID}`,
+      employee
+    );
     navigate("/employees");
   };
 
-  useEffect(()=>{
-    loadEmployee()
-  }, [])
+  useEffect(() => {
+    loadEmployee();
+  }, []);
 
-  const loadEmployee = async (e) =>{
-    const res = await axios.get(`http://localhost:8080/employees/${employeeID}`, employee)
-    setEmployee(res.data)
-    console.log(res.data)
-
-    }
+  const loadEmployee = async (e) => {
+    const res = await axios.get(
+      `http://localhost:8080/employees/${employeeID}`,
+      employee
+    );
+    setEmployee(res.data);
+    console.log(res.data);
+  };
 
   return (
     <div className="container">

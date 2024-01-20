@@ -36,7 +36,7 @@ const Home = () => {
                         <td>{employee.firstName}</td>
                         <td>{employee.lastName}</td>
                         <td>
-                            <button className="btn btn-info mx-2">View</button>
+                            <Link to={`/employees/${employee.employeeID}`} className="btn btn-info mx-2">View</Link>
                             <Link to={`/editEmployee/${employee.employeeID}`} className="btn btn-dark mx-2">Edit</Link>
                             <button className="btn btn-danger mx-2">Delete</button>
                         </td>
