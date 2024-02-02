@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
@@ -27,6 +27,17 @@ const AddEmployee = () => {
     salary,
   } = employee;
 
+  const [companies, setCompanies] = useState([]);
+
+  const loadCompanies = async () => {
+    const res = await axios.get(`http://localhost:8080/companies`);
+    setCompanies(res.data);
+  };
+
+  useEffect(() => {
+    loadCompanies();
+  });
+
   const handleChange = (e) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
   };
@@ -34,7 +45,6 @@ const AddEmployee = () => {
   let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    console.log("AAA");
     e.preventDefault();
     await axios.post("http://localhost:8080/employee", employee);
     navigate("/employees");
@@ -70,8 +80,11 @@ const AddEmployee = () => {
                 <option value="" disabled>
                   Select Company ID
                 </option>
-                <option value="ABC">ABC</option>
-                <option value="ABC">DEF</option>
+                {companies.map((company, index) => (
+                  <option value={company.companyID}>
+                    {company.companyID} - {company.companyName}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="mb-3">

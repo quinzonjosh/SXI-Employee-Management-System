@@ -26,7 +26,6 @@ const ViewEmployee = () => {
       employee
     );
     setEmployee(res.data);
-    console.log(res.data);
   };
 
   return (
