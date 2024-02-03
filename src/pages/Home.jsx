@@ -14,6 +14,12 @@ const Home = () => {
     setEmployees(result.data);
   };
 
+  const handleDelete = async (employeeID) => {
+    // console.log(employeeID);
+    await axios.delete(`http://localhost:8080/employees/delete/${employeeID}`);
+    loadEmployees();
+  }
+
   return (
     <div className="">
       <div className="p-4">
@@ -38,7 +44,7 @@ const Home = () => {
                         <td>
                             <Link to={`/employees/${employee.employeeID}`} className="btn btn-info mx-2">View</Link>
                             <Link to={`/editEmployee/${employee.employeeID}`} className="btn btn-dark mx-2">Edit</Link>
-                            <button className="btn btn-danger mx-2">Delete</button>
+                            <button onClick={() => handleDelete(employee.employeeID)} className="btn btn-danger mx-2">Delete</button>
                         </td>
                     </tr>
                 ))

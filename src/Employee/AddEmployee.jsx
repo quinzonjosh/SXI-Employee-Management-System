@@ -1,10 +1,11 @@
+// LAST STOP: EMPLOYEEID AND COMPANY ID NOT BEING ACQUIRED BY FORM ONSUBMIT
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 const AddEmployee = () => {
   const [employee, setEmployee] = useState({
-    employeeID: "",
     companyID: "",
     firstName: "",
     middleName: "",
@@ -28,15 +29,22 @@ const AddEmployee = () => {
   } = employee;
 
   const [companies, setCompanies] = useState([]);
+  const [nextEmployeeID, setNextEmployeeID] = useState("");
 
   const loadCompanies = async () => {
     const res = await axios.get(`http://localhost:8080/companies`);
     setCompanies(res.data);
   };
 
+  const loadNextEmployeeID = async () => {
+    const res = await axios.get(`http://localhost:8080/employees/latestID`);
+    setNextEmployeeID(res.data);
+  }
+
   useEffect(() => {
+    loadNextEmployeeID();
     loadCompanies();
-  });
+  }, []);
 
   const handleChange = (e) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
@@ -46,6 +54,8 @@ const AddEmployee = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    employee.employeeID = nextEmployeeID;    
     await axios.post("http://localhost:8080/employee", employee);
     navigate("/employees");
   };
@@ -57,18 +67,19 @@ const AddEmployee = () => {
           <h2 className="text-center m-4">Add Employee</h2>
           <form onSubmit={(e) => handleSubmit(e)}>
             <div className="mb-3">
-              <label htmlFor="employeeID">Employee ID</label>
+              <label className="fw-bold" htmlFor="employeeID">Employee ID</label>
               <input
                 type="text"
                 className="form-control"
                 placeholder="Enter Employee ID"
                 name="employeeID"
-                value={employeeID}
+                value={nextEmployeeID}
                 onChange={(e) => handleChange(e)}
+                readOnly
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="companyID" className="form-label">
+              <label htmlFor="companyID" className="form-label fw-bold">
                 Company ID
               </label>
               <select
@@ -88,7 +99,7 @@ const AddEmployee = () => {
               </select>
             </div>
             <div className="mb-3">
-              <label htmlFor="firstName" className="form-label">
+              <label htmlFor="firstName" className="form-label fw-bold">
                 Firstname
               </label>
               <input
@@ -101,7 +112,7 @@ const AddEmployee = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="middleName" className="form-label">
+              <label htmlFor="middleName" className="form-label fw-bold">
                 Middlename
               </label>
               <input
@@ -114,7 +125,7 @@ const AddEmployee = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="lastName" className="form-label">
+              <label htmlFor="lastName" className="form-label fw-bold">
                 lastname
               </label>
               <input
@@ -127,7 +138,7 @@ const AddEmployee = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="tin" className="form-label">
+              <label htmlFor="tin" className="form-label fw-bold">
                 Tax Identification Number (TIN)
               </label>
               <input
@@ -140,7 +151,7 @@ const AddEmployee = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="sssGsis" className="form-label">
+              <label htmlFor="sssGsis" className="form-label fw-bold">
                 SSS/GSIS
               </label>
               <input
@@ -153,7 +164,7 @@ const AddEmployee = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="hireDate" className="form-label">
+              <label htmlFor="hireDate" className="form-label fw-bold">
                 Hire Date
               </label>
               <input
@@ -166,7 +177,7 @@ const AddEmployee = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="salary" className="form-label">
+              <label htmlFor="salary" className="form-label fw-bold">
                 Salary
               </label>
               <input
