@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import axios, { toFormData } from "axios";
 
 const AddEmployee = () => {
   const [employee, setEmployee] = useState({
@@ -29,7 +29,6 @@ const AddEmployee = () => {
   } = employee;
 
   const [companies, setCompanies] = useState([]);
-  const [nextEmployeeID, setNextEmployeeID] = useState("");
 
   const loadCompanies = async () => {
     const res = await axios.get(`http://localhost:8080/companies`);
@@ -38,8 +37,8 @@ const AddEmployee = () => {
 
   const loadNextEmployeeID = async () => {
     const res = await axios.get(`http://localhost:8080/employees/latestID`);
-    setNextEmployeeID(res.data);
-  }
+    employee.employeeID = res.data;
+  };
 
   useEffect(() => {
     loadNextEmployeeID();
@@ -52,12 +51,59 @@ const AddEmployee = () => {
 
   let navigate = useNavigate();
 
+  function areLettersOnly(str) {
+    const regex = /^[a-zA-Z]+$/;
+    return regex.test(str);
+  }
+
+  function areNumbersOnly(str) {
+    const regex = /^[0-9]+$/;
+    return regex.test(str);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    employee.employeeID = nextEmployeeID;    
-    await axios.post("http://localhost:8080/employee", employee);
-    navigate("/employees");
+    const hireDate = new Date(employee.hireDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (
+      !employee.companyID ||
+      !employee.firstName ||
+      !employee.middleName ||
+      !employee.lastName ||
+      !employee.tin ||
+      !employee.sssGsis ||
+      !employee.hireDate
+    ) {
+      alert("Please fill out all fields.");
+    } else if (
+      !areLettersOnly(employee.firstName) ||
+      !areLettersOnly(employee.middleName) ||
+      !areLettersOnly(employee.lastName)
+    ) {
+      alert("Please remove numbers/special characters on your name.")
+    } else if (!areNumbersOnly(employee.tin)){
+      alert("Please remove letters/characters on your TIN.")
+    } else if (employee.tin.length !== 12){
+      alert("TIN must be a 12 digit number.")
+    } else if (!areNumbersOnly(employee.sssGsis)){
+      alert("Please remove letters/characters on your SSS/GSIS.")
+    } else if (employee.sssGsis.length !== 10){
+      alert("TIN must be a 10 digit number.")
+    } else if (new Date(employee.hireDate) > new Date().setHours(0,0,0,0)){
+      alert("Date must not be later than today")
+    } else if (!areNumbersOnly(employee.salary)){
+      alert("Please remove letters/special characters on your Salary.")
+    } else if (salary < 500 || salary > 1999999999 /* 2 billion */) {
+      alert("Salary must be in in between 499 and 2 billion.")
+    } else {
+      await axios.post("http://localhost:8080/employee", employee);
+      alert("Form submitted successfully!");
+      navigate("/employees");
+    }
+    
   };
 
   return (
@@ -67,13 +113,15 @@ const AddEmployee = () => {
           <h2 className="text-center m-4">Add Employee</h2>
           <form onSubmit={(e) => handleSubmit(e)}>
             <div className="mb-3">
-              <label className="fw-bold" htmlFor="employeeID">Employee ID</label>
+              <label className="fw-bold" htmlFor="employeeID">
+                Employee ID
+              </label>
               <input
                 type="text"
                 className="form-control"
                 placeholder="Enter Employee ID"
                 name="employeeID"
-                value={nextEmployeeID}
+                value={employeeID}
                 onChange={(e) => handleChange(e)}
                 readOnly
               />
@@ -181,7 +229,7 @@ const AddEmployee = () => {
                 Salary
               </label>
               <input
-                type="number"
+                type="text"
                 className="form-control"
                 placeholder="Enter Salary"
                 name="salary"
