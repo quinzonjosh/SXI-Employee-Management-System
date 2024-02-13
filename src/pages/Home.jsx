@@ -10,13 +10,15 @@ const Home = () => {
   }, []);
 
   const loadEmployees = async () => {
-    const result = await axios.get("http://localhost:8080/employees");
+    const result = await axios.get("http://localhost:8080/currentEmployees");
     setEmployees(result.data);
+    // console.log(result.data);
   };
 
   const handleDelete = async (employeeID) => {
     // console.log(employeeID);
-    await axios.delete(`http://localhost:8080/employees/delete/${employeeID}`);
+    const res = await axios.delete(`http://localhost:8080/employees/softDelete/${employeeID}`);
+    // console.log(res.data);
     loadEmployees();
   }
 

@@ -52,7 +52,7 @@ const EditEmployee = () => {
       employee
     );
     setEmployee(res.data);
-    console.log(res.data);
+    // console.log(res.data);
   };
 
   return (
