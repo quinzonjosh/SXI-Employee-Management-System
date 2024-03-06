@@ -3,6 +3,11 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import axios from "axios";
 
 const EditEmployee = () => {
+
+  let navigate = useNavigate();
+  const { employeeID } = useParams();
+  const [companies, setCompanies] = useState([]);
+
   const [employee, setEmployee] = useState({
     companyID: "",
     firstName: "",
@@ -25,30 +30,25 @@ const EditEmployee = () => {
     salary,
   } = employee;
 
-  const { employeeID } = useParams();
-  const [companies, setCompanies] = useState([]);
-
   const loadCompanies = async () => {
     const res = await axios.get(`http://localhost:8080/companies`);
     setCompanies(res.data);
-  };
-
-  const handleChange = (e) => {
-    setEmployee({ ...employee, [e.target.name]: e.target.value });
-  };
-
-  let navigate = useNavigate();
-
+  };  
+  
   function areLettersOnly(str) {
     const regex = /^[a-zA-Z]+$/;
     return regex.test(str);
   }
-
+  
   function areNumbersOnly(str) {
     const regex = /^[0-9]+$/;
     return regex.test(str);
   }
-
+  
+  const handleChange = (e) => {
+    setEmployee({ ...employee, [e.target.name]: e.target.value });
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 

@@ -3,6 +3,8 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import axios from "axios";
 
 const ViewEmployee = () => {
+  const { employeeID } = useParams();
+
   const [employee, setEmployee] = useState({
     companyID: "",
     firstName: "",
@@ -13,8 +15,6 @@ const ViewEmployee = () => {
     hireDate: "",
     salary: 500,
   });
-
-  const { employeeID } = useParams();
 
   useEffect(() => {
     loadEmployee();

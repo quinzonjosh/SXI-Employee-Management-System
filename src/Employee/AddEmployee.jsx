@@ -3,6 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import axios, { toFormData } from "axios";
 
 const AddEmployee = () => {
+  
+  let navigate = useNavigate();
+  const [companies, setCompanies] = useState([]);
+  
   const [employee, setEmployee] = useState({
     companyID: "",
     firstName: "",
@@ -13,6 +17,11 @@ const AddEmployee = () => {
     hireDate: "",
     salary: 500,
   });
+
+  useEffect(() => {
+    loadNextEmployeeID();
+    loadCompanies();
+  }, []);
 
   const {
     employeeID,
@@ -26,8 +35,6 @@ const AddEmployee = () => {
     salary,
   } = employee;
 
-  const [companies, setCompanies] = useState([]);
-
   const loadCompanies = async () => {
     const res = await axios.get(`http://localhost:8080/companies`);
     setCompanies(res.data);
@@ -38,17 +45,6 @@ const AddEmployee = () => {
     employee.employeeID = res.data;
   };
 
-  useEffect(() => {
-    loadNextEmployeeID();
-    loadCompanies();
-  }, []);
-
-  const handleChange = (e) => {
-    setEmployee({ ...employee, [e.target.name]: e.target.value });
-  };
-
-  let navigate = useNavigate();
-
   function areLettersOnly(str) {
     const regex = /^[a-zA-Z]+$/;
     return regex.test(str);
@@ -58,6 +54,10 @@ const AddEmployee = () => {
     const regex = /^[0-9]+$/;
     return regex.test(str);
   }
+
+  const handleChange = (e) => {
+    setEmployee({ ...employee, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
