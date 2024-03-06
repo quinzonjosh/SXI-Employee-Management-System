@@ -73,25 +73,30 @@ const EditEmployee = () => {
       !areLettersOnly(employee.lastName)
     ) {
       alert("Please remove numbers/special characters on your name.");
-    } else if (!areNumbersOnly(employee.tin)) {
+    } else if (isTINEdited && !areNumbersOnly(employee.tin)) {
       alert("Please remove letters/characters on your TIN.");
-    } else if (employee.tin.length !== 12) {
+    } else if (isTINEdited && employee.tin.length !== 12) {
       alert("TIN must be a 12 digit number.");
-    } else if (!areNumbersOnly(employee.sssGsis)) {
+    } else if (isTINEdited && isInList(employee.tin, tins)) {
+      alert("TIN already registered");
+    } else if (isSSSGSISEdited && !areNumbersOnly(employee.sssGsis)) {
       alert("Please remove letters/characters on your SSS/GSIS.");
-    } else if (employee.sssGsis.length !== 10) {
-      alert("TIN must be a 10 digit number.");
+    } else if (isSSSGSISEdited && employee.sssGsis.length !== 10) {
+      alert("SSS/GSIS must be a 10 digit number.");
+    } else if (isSSSGSISEdited && isInList(employee.sssGsis, sssGsiss)) {
+      alert("SSS/GSIS already registered");
     } else if (new Date(employee.hireDate) > new Date().setHours(0, 0, 0, 0)) {
       alert("Date must not be later than yesterday");
     } else if (!areNumbersOnly(employee.salary)) {
       alert("Please remove letters/special characters on your Salary.");
-    } else if (salary < 500 || salary > 1999999999 /* 2 billion */) {
+    } else if (salary < 500 || salary > 1_999_999_999 /* 2 billion */) {
       alert("Salary must be in in between 499 and 2 billion.");
     } else {
       await axios.put(
         `http://localhost:8080/employees/edit/${employeeID}`,
         employee
       );
+      alert("Form updated successfully!");
       navigate("/employees");
     }
   };
@@ -99,6 +104,8 @@ const EditEmployee = () => {
   useEffect(() => {
     loadEmployee();
     loadCompanies();
+    loadTINs();
+    loadSSSGSISs();
   }, []);
 
   const loadEmployee = async (e) => {
