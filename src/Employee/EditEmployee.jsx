@@ -26,6 +26,12 @@ const EditEmployee = () => {
   } = employee;
 
   const { employeeID } = useParams();
+  const [companies, setCompanies] = useState([]);
+
+  const loadCompanies = async () => {
+    const res = await axios.get(`http://localhost:8080/companies`);
+    setCompanies(res.data);
+  };
 
   const handleChange = (e) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
@@ -33,17 +39,66 @@ const EditEmployee = () => {
 
   let navigate = useNavigate();
 
+  function areLettersOnly(str) {
+    const regex = /^[a-zA-Z]+$/;
+    return regex.test(str);
+  }
+
+  function areNumbersOnly(str) {
+    const regex = /^[0-9]+$/;
+    return regex.test(str);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.put(
-      `http://localhost:8080/employees/edit/${employeeID}`,
-      employee
-    );
-    navigate("/employees");
+
+    // for hire date validation
+    const hireDate = new Date(employee.hireDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (
+      !employee.companyID ||
+      !employee.firstName ||
+      !employee.middleName ||
+      !employee.lastName ||
+      !employee.tin ||
+      !employee.sssGsis ||
+      !employee.hireDate
+    ) {
+      alert("Please fill out all fields.");
+    } else if (
+      !areLettersOnly(employee.firstName) ||
+      !areLettersOnly(employee.middleName) ||
+      !areLettersOnly(employee.lastName)
+    ) {
+      alert("Please remove numbers/special characters on your name.");
+    } else if (!areNumbersOnly(employee.tin)) {
+      alert("Please remove letters/characters on your TIN.");
+    } else if (employee.tin.length !== 12) {
+      alert("TIN must be a 12 digit number.");
+    } else if (!areNumbersOnly(employee.sssGsis)) {
+      alert("Please remove letters/characters on your SSS/GSIS.");
+    } else if (employee.sssGsis.length !== 10) {
+      alert("TIN must be a 10 digit number.");
+    } else if (new Date(employee.hireDate) > new Date().setHours(0, 0, 0, 0)) {
+      alert("Date must not be later than yesterday");
+    } else if (!areNumbersOnly(employee.salary)) {
+      alert("Please remove letters/special characters on your Salary.");
+    } else if (salary < 500 || salary > 1999999999 /* 2 billion */) {
+      alert("Salary must be in in between 499 and 2 billion.");
+    } else {
+      await axios.put(
+        `http://localhost:8080/employees/edit/${employeeID}`,
+        employee
+      );
+      navigate("/employees");
+    }
   };
 
   useEffect(() => {
     loadEmployee();
+    loadCompanies();
   }, []);
 
   const loadEmployee = async (e) => {
@@ -85,8 +140,11 @@ const EditEmployee = () => {
                 <option value="" disabled>
                   Select Company ID
                 </option>
-                <option value="ABC">ABC</option>
-                <option value="ABC">DEF</option>
+                {companies.map((company, index) => (
+                  <option value={company.companyID}>
+                    {company.companyID} - {company.companyName}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="mb-3">
