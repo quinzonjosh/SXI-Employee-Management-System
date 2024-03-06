@@ -1,5 +1,3 @@
-// LAST STOP: EMPLOYEEID AND COMPANY ID NOT BEING ACQUIRED BY FORM ONSUBMIT
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios, { toFormData } from "axios";
@@ -93,7 +91,7 @@ const AddEmployee = () => {
     } else if (employee.sssGsis.length !== 10){
       alert("TIN must be a 10 digit number.")
     } else if (new Date(employee.hireDate) > new Date().setHours(0,0,0,0)){
-      alert("Date must not be later than today")
+      alert("Date must not be later than yesterday")
     } else if (!areNumbersOnly(employee.salary)){
       alert("Please remove letters/special characters on your Salary.")
     } else if (salary < 500 || salary > 1999999999 /* 2 billion */) {
