@@ -3,6 +3,7 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import axios from "axios";
 
 const EditEmployee = () => {
+  
   const [employee, setEmployee] = useState({
     companyID: "",
     firstName: "",
@@ -27,14 +28,38 @@ const EditEmployee = () => {
 
   const { employeeID } = useParams();
   const [companies, setCompanies] = useState([]);
+  const [tins, setTins] = useState([]);
+  const [sssGsiss, setSSSGSISSs] = useState([]);
+
+  // perform input validation only if form is edited
+  const [isTINEdited, setIsTINEdited] = useState(false);
+  const [isSSSGSISEdited, setIsSSSGSISEdited] = useState(false);
 
   const loadCompanies = async () => {
     const res = await axios.get(`http://localhost:8080/companies`);
     setCompanies(res.data);
   };
 
+  const loadTINs = async () => {
+    const res = await axios.get(`http://localhost:8080/employees/tin`);
+    setTins(res.data);
+  };
+
+  const loadSSSGSISs = async () => {
+    const res = await axios.get(`http://localhost:8080/employees/sssGsis`);
+    setSSSGSISSs(res.data);
+  };
+
   const handleChange = (e) => {
-    setEmployee({ ...employee, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setEmployee({ ...employee, [name]: value });
+    
+    // Track if TIN or SSS/GSIS fields are edited
+    if (name === 'tin') {
+      setIsTINEdited(true);
+    } else if (name === 'sssGsis') {
+      setIsSSSGSISEdited(true);
+    }
   };
 
   let navigate = useNavigate();
@@ -47,6 +72,15 @@ const EditEmployee = () => {
   function areNumbersOnly(str) {
     const regex = /^[0-9]+$/;
     return regex.test(str);
+  }
+
+  function isInList(targetString, stringList) {
+    for (let i = 0; i < stringList.length; i++) {
+      if (stringList[i] == targetString) {
+        return true;
+      }
+    }
+    return false;
   }
 
   const handleSubmit = async (e) => {
@@ -73,25 +107,30 @@ const EditEmployee = () => {
       !areLettersOnly(employee.lastName)
     ) {
       alert("Please remove numbers/special characters on your name.");
-    } else if (!areNumbersOnly(employee.tin)) {
+    } else if (isTINEdited && !areNumbersOnly(employee.tin)) {
       alert("Please remove letters/characters on your TIN.");
-    } else if (employee.tin.length !== 12) {
+    } else if (isTINEdited && employee.tin.length !== 12) {
       alert("TIN must be a 12 digit number.");
-    } else if (!areNumbersOnly(employee.sssGsis)) {
+    } else if (isTINEdited && isInList(employee.tin, tins)) {
+      alert("TIN already registered");
+    } else if (isSSSGSISEdited && !areNumbersOnly(employee.sssGsis)) {
       alert("Please remove letters/characters on your SSS/GSIS.");
-    } else if (employee.sssGsis.length !== 10) {
-      alert("TIN must be a 10 digit number.");
+    } else if (isSSSGSISEdited && employee.sssGsis.length !== 10) {
+      alert("SSS/GSIS must be a 10 digit number.");
+    } else if (isSSSGSISEdited && isInList(employee.sssGsis, sssGsiss)) {
+      alert("SSS/GSIS already registered");
     } else if (new Date(employee.hireDate) > new Date().setHours(0, 0, 0, 0)) {
       alert("Date must not be later than yesterday");
     } else if (!areNumbersOnly(employee.salary)) {
       alert("Please remove letters/special characters on your Salary.");
-    } else if (salary < 500 || salary > 1999999999 /* 2 billion */) {
+    } else if (salary < 500 || salary > 1_999_999_999 /* 2 billion */) {
       alert("Salary must be in in between 499 and 2 billion.");
     } else {
       await axios.put(
         `http://localhost:8080/employees/edit/${employeeID}`,
         employee
       );
+      alert("Form updated successfully!");
       navigate("/employees");
     }
   };
@@ -99,6 +138,8 @@ const EditEmployee = () => {
   useEffect(() => {
     loadEmployee();
     loadCompanies();
+    loadTINs();
+    loadSSSGSISs();
   }, []);
 
   const loadEmployee = async (e) => {
