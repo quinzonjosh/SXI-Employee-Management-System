@@ -27,6 +27,8 @@ const AddEmployee = () => {
   } = employee;
 
   const [companies, setCompanies] = useState([]);
+  const [tins, setTins] = useState([]);
+  const [sssGsiss, setSSSGSISSs] = useState([]);
 
   const loadCompanies = async () => {
     const res = await axios.get(`http://localhost:8080/companies`);
@@ -38,9 +40,21 @@ const AddEmployee = () => {
     employee.employeeID = res.data;
   };
 
+  const loadTINs = async () => {
+    const res = await axios.get(`http://localhost:8080/employees/tin`);
+    setTins(res.data);
+  };
+
+  const loadSSSGSISs = async () => {
+    const res = await axios.get(`http://localhost:8080/employees/sssGsis`);
+    setSSSGSISSs(res.data);
+  };
+
   useEffect(() => {
     loadNextEmployeeID();
     loadCompanies();
+    loadTINs();
+    loadSSSGSISs();
   }, []);
 
   const handleChange = (e) => {
@@ -59,13 +73,22 @@ const AddEmployee = () => {
     return regex.test(str);
   }
 
+  function isInList(targetString, stringList) {
+    for (let i = 0; i < stringList.length; i++) {
+      if (stringList[i] == targetString) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const hireDate = new Date(employee.hireDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (
       !employee.companyID ||
       !employee.firstName ||
@@ -81,27 +104,30 @@ const AddEmployee = () => {
       !areLettersOnly(employee.middleName) ||
       !areLettersOnly(employee.lastName)
     ) {
-      alert("Please remove numbers/special characters on your name.")
-    } else if (!areNumbersOnly(employee.tin)){
-      alert("Please remove letters/characters on your TIN.")
-    } else if (employee.tin.length !== 12){
-      alert("TIN must be a 12 digit number.")
-    } else if (!areNumbersOnly(employee.sssGsis)){
-      alert("Please remove letters/characters on your SSS/GSIS.")
-    } else if (employee.sssGsis.length !== 10){
-      alert("TIN must be a 10 digit number.")
-    } else if (new Date(employee.hireDate) > new Date().setHours(0,0,0,0)){
-      alert("Date must not be later than yesterday")
-    } else if (!areNumbersOnly(employee.salary)){
-      alert("Please remove letters/special characters on your Salary.")
-    } else if (salary < 500 || salary > 1999999999 /* 2 billion */) {
-      alert("Salary must be in in between 499 and 2 billion.")
+      alert("Please remove numbers/special characters on your name.");
+    } else if (!areNumbersOnly(employee.tin)) {
+      alert("Please remove letters/characters on your TIN.");
+    } else if (employee.tin.length !== 12) {
+      alert("TIN must be a 12 digit number.");
+    } else if (isInList(employee.tin, tins)) {
+      alert("TIN already registered");
+    } else if (!areNumbersOnly(employee.sssGsis)) {
+      alert("Please remove letters/characters on your SSS/GSIS.");
+    } else if (employee.sssGsis.length !== 10) {
+      alert("SSS/GSIS must be a 10 digit number.");
+    } else if (isInList(employee.sssGsis, sssGsiss)) {
+      alert("SSS/GSIS already registered");
+    } else if (new Date(employee.hireDate) > new Date().setHours(0, 0, 0, 0)) {
+      alert("Date must not be later than yesterday");
+    } else if (!areNumbersOnly(employee.salary)) {
+      alert("Please remove letters/special characters on your Salary.");
+    } else if (salary < 500 || salary > 1_999_999_999 /* 2 billion */) {
+      alert("Salary must be in in between 499 and 2 billion.");
     } else {
       await axios.post("http://localhost:8080/employee", employee);
       alert("Form submitted successfully!");
       navigate("/employees");
     }
-    
   };
 
   return (
